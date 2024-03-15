@@ -1,8 +1,23 @@
 import requests
 from bs4 import BeautifulSoup
 
-def parse_xml():
-    url = "https://www.europarl.europa.eu/doceo/document/PV-9-2024-03-11-RCV_EN.xml"
+import requests
+from bs4 import BeautifulSoup
+import datetime
+
+def generate_urls(start_year, end_year, end_month, end_day):
+    urls = []
+    current_date = datetime.date(start_year, 1, 1)
+    end_date = datetime.date(end_year, end_month, end_day)
+
+    while current_date <= end_date:
+        url = f"https://www.europarl.europa.eu/doceo/document/PV-9-{current_date.year}-{current_date.month:02d}-{current_date.day:02d}-RCV_EN.xml"
+        urls.append(url)
+        current_date += datetime.timedelta(days=1)
+
+    return urls
+
+def parse_xml(url):
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -46,8 +61,25 @@ def parse_xml():
 
         return votes
     else:
-        print("Failed to parse XML.")
-        return None
+        print(f"Failed to parse XML (Status code: {response.status_code}): {url}")
+        return []
 
-result = parse_xml()
-print(f"Results: {result}")
+urls = generate_urls(2019, 2024, 3, 15)
+
+all_votes = []
+
+for url in urls:
+    result = parse_xml(url)
+    all_votes.extend(result)
+
+print(f"Results: {all_votes}")
+
+
+
+url="https://www.europarl.europa.eu/doceo/document/PV-9-2024-03-04-RCV_EN.xml"
+def getUrl(url):
+    response = requests.get(url)
+    return response.status_code
+
+res = getUrl(url)
+print(f"Results: {res}")
