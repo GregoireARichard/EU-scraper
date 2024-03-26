@@ -35,6 +35,10 @@ def parse_xml(url):
             result_for_tag = roll_call_vote_description.find_previous("Result.For")
             result_against_tag = roll_call_vote_description.find_previous("Result.Against")
 
+            # Search for the PV.RollCallVoteResult tag and extract the Sitting.Date attribute value
+            roll_call_vote_result = roll_call_vote_description.find_previous("PV.RollCallVoteResults")
+            date = roll_call_vote_result["Sitting.Date"] if roll_call_vote_result else None
+
             if result_for_tag:
                 for_identifiers = {}
                 for political_group_list in result_for_tag.find_all("Result.PoliticalGroup.List"):
@@ -57,6 +61,7 @@ def parse_xml(url):
                 "name": vote_name,
                 "for": for_identifiers,
                 "against": against_identifiers,
+                "date": date
             }
 
             votes.append(vote)
@@ -72,6 +77,8 @@ def parse_xml(url):
             if response.status_code == 404:
                  print(f"Failed to parse XML (Status code: {response.status_code}): {url}")
             return []
+
+
 
 urls = generate_urls(2019, 2024, 3, 15)
 
